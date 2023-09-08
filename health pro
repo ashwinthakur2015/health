@@ -1,0 +1,913 @@
+
+Open In Colab
+BREAST CANCER CLASSIFICATION
+Via SuperDataScience Team
+Breast cancer is the most common cancer among women worldwide accounting for 25% of all cancer cases and infected two point one million people in 2015.
+Ealy diagnosis significantly increase the chances of survival.
+The key challenge in cancer detection is how to classify tumours into malignant or benign machine learning techniques can dramatically improve the accuracy of diagnosis.
+Research indicates that most experienced physicians can diagnose cancer with 79% accuracy.
+First stage: Any process which is simply extracting some of the cells out of the tumour
+
+When we say benign that means the tumour is kind of not spreading across the body so the patient is safe somehow if it's malignant that means it's a cancerous. That means we need to intervene and actually stopping cancer growth.
+
+What we do here in the machine learning aspect.
+
+We excute all these images and
+We wanted to specify if that cancer out of these image is malignant or benign.
+So what we do with that we extract out of these images some features when we see features that mean some characteristics out of the image such as
+
+radius
+cells
+texture
+perimeter
+area
+smoothness
+We feed all these features in to kind of our machine learning model.
+
+MAIN PART: We want to teach the machine how to basically classify images or classify data and tell us if it's malignant or benign.
+
+PROBLEM IN MACHINE LEARNING VOCABULARY
+Input: 30 feautures
+
+Radius
+Texture
+Perimeter
+Area
+Smoothness
+...
+Target Class: 2
+
+Malignant
+Benign
+How many datasets we have? :
+
+Number of Instances : 569
+Class Distribution: 212 Malignant, 357 Benign
+Data source:
+
+[Breast Cancer Wisconsin(Diagnostic)](https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)
+Breast Cancer Detection with Reduced Feature Set
+We're going to say look if you look at these features then indicate that the cancer is let's say zero which is malignant in this case.
+
+And then if we look at the 30 features may be classified as one which kind of a benign.
+
+So it's kind of the opiate is binary in a forum indicating zero or one for malignant or benign.
+
+SUPPORT VECTOR MACHINE CLASSIFIER
+
+Near the max Margin Hyperplane, we don't know whether this cancer is malignant or benign.
+
+That's why the support vector machine classifier is very unique in this sense. It's simply uses the points or the support vectors that are on the boundary to draw the boundary out to classify the classes.
+
+Support vector machines are really powerful techniques. Why? Because it's kind of an extreme algorithm. It just focus on the support of the suppor vectors or the points on the boundary and seperate them somehow.
+
+IMPORTING DATA
+
+
+# import libraries 
+import pandas as pd # Import Pandas for data manipulation using dataframes
+import numpy as np # Import Numpy for data statistical analysis 
+import matplotlib.pyplot as plt # Import matplotlib for data visualisation
+import seaborn as sns # Statistical data visualization
+# %matplotlib inline
+     
+
+# Import Cancer data drom the Sklearn library
+from sklearn.datasets import load_breast_cancer
+cancer = load_breast_cancer()
+     
+
+cancer
+     
+{'DESCR': '.. _breast_cancer_dataset:\n\nBreast cancer wisconsin (diagnostic) dataset\n--------------------------------------------\n\n**Data Set Characteristics:**\n\n    :Number of Instances: 569\n\n    :Number of Attributes: 30 numeric, predictive attributes and the class\n\n    :Attribute Information:\n        - radius (mean of distances from center to points on the perimeter)\n        - texture (standard deviation of gray-scale values)\n        - perimeter\n        - area\n        - smoothness (local variation in radius lengths)\n        - compactness (perimeter^2 / area - 1.0)\n        - concavity (severity of concave portions of the contour)\n        - concave points (number of concave portions of the contour)\n        - symmetry \n        - fractal dimension ("coastline approximation" - 1)\n\n        The mean, standard error, and "worst" or largest (mean of the three\n        largest values) of these features were computed for each image,\n        resulting in 30 features.  For instance, field 3 is Mean Radius, field\n        13 is Radius SE, field 23 is Worst Radius.\n\n        - class:\n                - WDBC-Malignant\n                - WDBC-Benign\n\n    :Summary Statistics:\n\n    ===================================== ====== ======\n                                           Min    Max\n    ===================================== ====== ======\n    radius (mean):                        6.981  28.11\n    texture (mean):                       9.71   39.28\n    perimeter (mean):                     43.79  188.5\n    area (mean):                          143.5  2501.0\n    smoothness (mean):                    0.053  0.163\n    compactness (mean):                   0.019  0.345\n    concavity (mean):                     0.0    0.427\n    concave points (mean):                0.0    0.201\n    symmetry (mean):                      0.106  0.304\n    fractal dimension (mean):             0.05   0.097\n    radius (standard error):              0.112  2.873\n    texture (standard error):             0.36   4.885\n    perimeter (standard error):           0.757  21.98\n    area (standard error):                6.802  542.2\n    smoothness (standard error):          0.002  0.031\n    compactness (standard error):         0.002  0.135\n    concavity (standard error):           0.0    0.396\n    concave points (standard error):      0.0    0.053\n    symmetry (standard error):            0.008  0.079\n    fractal dimension (standard error):   0.001  0.03\n    radius (worst):                       7.93   36.04\n    texture (worst):                      12.02  49.54\n    perimeter (worst):                    50.41  251.2\n    area (worst):                         185.2  4254.0\n    smoothness (worst):                   0.071  0.223\n    compactness (worst):                  0.027  1.058\n    concavity (worst):                    0.0    1.252\n    concave points (worst):               0.0    0.291\n    symmetry (worst):                     0.156  0.664\n    fractal dimension (worst):            0.055  0.208\n    ===================================== ====== ======\n\n    :Missing Attribute Values: None\n\n    :Class Distribution: 212 - Malignant, 357 - Benign\n\n    :Creator:  Dr. William H. Wolberg, W. Nick Street, Olvi L. Mangasarian\n\n    :Donor: Nick Street\n\n    :Date: November, 1995\n\nThis is a copy of UCI ML Breast Cancer Wisconsin (Diagnostic) datasets.\nhttps://goo.gl/U2Uwz2\n\nFeatures are computed from a digitized image of a fine needle\naspirate (FNA) of a breast mass.  They describe\ncharacteristics of the cell nuclei present in the image.\n\nSeparating plane described above was obtained using\nMultisurface Method-Tree (MSM-T) [K. P. Bennett, "Decision Tree\nConstruction Via Linear Programming." Proceedings of the 4th\nMidwest Artificial Intelligence and Cognitive Science Society,\npp. 97-101, 1992], a classification method which uses linear\nprogramming to construct a decision tree.  Relevant features\nwere selected using an exhaustive search in the space of 1-4\nfeatures and 1-3 separating planes.\n\nThe actual linear program used to obtain the separating plane\nin the 3-dimensional space is that described in:\n[K. P. Bennett and O. L. Mangasarian: "Robust Linear\nProgramming Discrimination of Two Linearly Inseparable Sets",\nOptimization Methods and Software 1, 1992, 23-34].\n\nThis database is also available through the UW CS ftp server:\n\nftp ftp.cs.wisc.edu\ncd math-prog/cpo-dataset/machine-learn/WDBC/\n\n.. topic:: References\n\n   - W.N. Street, W.H. Wolberg and O.L. Mangasarian. Nuclear feature extraction \n     for breast tumor diagnosis. IS&T/SPIE 1993 International Symposium on \n     Electronic Imaging: Science and Technology, volume 1905, pages 861-870,\n     San Jose, CA, 1993.\n   - O.L. Mangasarian, W.N. Street and W.H. Wolberg. Breast cancer diagnosis and \n     prognosis via linear programming. Operations Research, 43(4), pages 570-577, \n     July-August 1995.\n   - W.H. Wolberg, W.N. Street, and O.L. Mangasarian. Machine learning techniques\n     to diagnose breast cancer from fine-needle aspirates. Cancer Letters 77 (1994) \n     163-171.',
+ 'data': array([[1.799e+01, 1.038e+01, 1.228e+02, ..., 2.654e-01, 4.601e-01,
+         1.189e-01],
+        [2.057e+01, 1.777e+01, 1.329e+02, ..., 1.860e-01, 2.750e-01,
+         8.902e-02],
+        [1.969e+01, 2.125e+01, 1.300e+02, ..., 2.430e-01, 3.613e-01,
+         8.758e-02],
+        ...,
+        [1.660e+01, 2.808e+01, 1.083e+02, ..., 1.418e-01, 2.218e-01,
+         7.820e-02],
+        [2.060e+01, 2.933e+01, 1.401e+02, ..., 2.650e-01, 4.087e-01,
+         1.240e-01],
+        [7.760e+00, 2.454e+01, 4.792e+01, ..., 0.000e+00, 2.871e-01,
+         7.039e-02]]),
+ 'feature_names': array(['mean radius', 'mean texture', 'mean perimeter', 'mean area',
+        'mean smoothness', 'mean compactness', 'mean concavity',
+        'mean concave points', 'mean symmetry', 'mean fractal dimension',
+        'radius error', 'texture error', 'perimeter error', 'area error',
+        'smoothness error', 'compactness error', 'concavity error',
+        'concave points error', 'symmetry error',
+        'fractal dimension error', 'worst radius', 'worst texture',
+        'worst perimeter', 'worst area', 'worst smoothness',
+        'worst compactness', 'worst concavity', 'worst concave points',
+        'worst symmetry', 'worst fractal dimension'], dtype='<U23'),
+ 'filename': '/usr/local/lib/python3.6/dist-packages/sklearn/datasets/data/breast_cancer.csv',
+ 'target': array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+        0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0,
+        1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0,
+        1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1,
+        1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0,
+        0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1,
+        1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0,
+        0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0,
+        1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1,
+        1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0,
+        0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0,
+        0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0,
+        1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1,
+        1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1,
+        1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+        1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
+        1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1,
+        1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1]),
+ 'target_names': array(['malignant', 'benign'], dtype='<U9')}
+
+# What dictionaries we have
+cancer.keys()
+     
+dict_keys(['data', 'target', 'target_names', 'DESCR', 'feature_names', 'filename'])
+
+# print them one by one
+print(cancer['DESCR'])
+     
+.. _breast_cancer_dataset:
+
+Breast cancer wisconsin (diagnostic) dataset
+--------------------------------------------
+
+**Data Set Characteristics:**
+
+    :Number of Instances: 569
+
+    :Number of Attributes: 30 numeric, predictive attributes and the class
+
+    :Attribute Information:
+        - radius (mean of distances from center to points on the perimeter)
+        - texture (standard deviation of gray-scale values)
+        - perimeter
+        - area
+        - smoothness (local variation in radius lengths)
+        - compactness (perimeter^2 / area - 1.0)
+        - concavity (severity of concave portions of the contour)
+        - concave points (number of concave portions of the contour)
+        - symmetry 
+        - fractal dimension ("coastline approximation" - 1)
+
+        The mean, standard error, and "worst" or largest (mean of the three
+        largest values) of these features were computed for each image,
+        resulting in 30 features.  For instance, field 3 is Mean Radius, field
+        13 is Radius SE, field 23 is Worst Radius.
+
+        - class:
+                - WDBC-Malignant
+                - WDBC-Benign
+
+    :Summary Statistics:
+
+    ===================================== ====== ======
+                                           Min    Max
+    ===================================== ====== ======
+    radius (mean):                        6.981  28.11
+    texture (mean):                       9.71   39.28
+    perimeter (mean):                     43.79  188.5
+    area (mean):                          143.5  2501.0
+    smoothness (mean):                    0.053  0.163
+    compactness (mean):                   0.019  0.345
+    concavity (mean):                     0.0    0.427
+    concave points (mean):                0.0    0.201
+    symmetry (mean):                      0.106  0.304
+    fractal dimension (mean):             0.05   0.097
+    radius (standard error):              0.112  2.873
+    texture (standard error):             0.36   4.885
+    perimeter (standard error):           0.757  21.98
+    area (standard error):                6.802  542.2
+    smoothness (standard error):          0.002  0.031
+    compactness (standard error):         0.002  0.135
+    concavity (standard error):           0.0    0.396
+    concave points (standard error):      0.0    0.053
+    symmetry (standard error):            0.008  0.079
+    fractal dimension (standard error):   0.001  0.03
+    radius (worst):                       7.93   36.04
+    texture (worst):                      12.02  49.54
+    perimeter (worst):                    50.41  251.2
+    area (worst):                         185.2  4254.0
+    smoothness (worst):                   0.071  0.223
+    compactness (worst):                  0.027  1.058
+    concavity (worst):                    0.0    1.252
+    concave points (worst):               0.0    0.291
+    symmetry (worst):                     0.156  0.664
+    fractal dimension (worst):            0.055  0.208
+    ===================================== ====== ======
+
+    :Missing Attribute Values: None
+
+    :Class Distribution: 212 - Malignant, 357 - Benign
+
+    :Creator:  Dr. William H. Wolberg, W. Nick Street, Olvi L. Mangasarian
+
+    :Donor: Nick Street
+
+    :Date: November, 1995
+
+This is a copy of UCI ML Breast Cancer Wisconsin (Diagnostic) datasets.
+https://goo.gl/U2Uwz2
+
+Features are computed from a digitized image of a fine needle
+aspirate (FNA) of a breast mass.  They describe
+characteristics of the cell nuclei present in the image.
+
+Separating plane described above was obtained using
+Multisurface Method-Tree (MSM-T) [K. P. Bennett, "Decision Tree
+Construction Via Linear Programming." Proceedings of the 4th
+Midwest Artificial Intelligence and Cognitive Science Society,
+pp. 97-101, 1992], a classification method which uses linear
+programming to construct a decision tree.  Relevant features
+were selected using an exhaustive search in the space of 1-4
+features and 1-3 separating planes.
+
+The actual linear program used to obtain the separating plane
+in the 3-dimensional space is that described in:
+[K. P. Bennett and O. L. Mangasarian: "Robust Linear
+Programming Discrimination of Two Linearly Inseparable Sets",
+Optimization Methods and Software 1, 1992, 23-34].
+
+This database is also available through the UW CS ftp server:
+
+ftp ftp.cs.wisc.edu
+cd math-prog/cpo-dataset/machine-learn/WDBC/
+
+.. topic:: References
+
+   - W.N. Street, W.H. Wolberg and O.L. Mangasarian. Nuclear feature extraction 
+     for breast tumor diagnosis. IS&T/SPIE 1993 International Symposium on 
+     Electronic Imaging: Science and Technology, volume 1905, pages 861-870,
+     San Jose, CA, 1993.
+   - O.L. Mangasarian, W.N. Street and W.H. Wolberg. Breast cancer diagnosis and 
+     prognosis via linear programming. Operations Research, 43(4), pages 570-577, 
+     July-August 1995.
+   - W.H. Wolberg, W.N. Street, and O.L. Mangasarian. Machine learning techniques
+     to diagnose breast cancer from fine-needle aspirates. Cancer Letters 77 (1994) 
+     163-171.
+
+print(cancer['target'])
+     
+[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 1 0 0 0 0 0 0 0 0 1 0 1 1 1 1 1 0 0 1 0 0 1 1 1 1 0 1 0 0 1 1 1 1 0 1 0 0
+ 1 0 1 0 0 1 1 1 0 0 1 0 0 0 1 1 1 0 1 1 0 0 1 1 1 0 0 1 1 1 1 0 1 1 0 1 1
+ 1 1 1 1 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 1 0 0 1 0 0 1 1 0 1 1 0 1 1 1 1 0 1
+ 1 1 1 1 1 1 1 1 0 1 1 1 1 0 0 1 0 1 1 0 0 1 1 0 0 1 1 1 1 0 1 1 0 0 0 1 0
+ 1 0 1 1 1 0 1 1 0 0 1 0 0 0 0 1 0 0 0 1 0 1 0 1 1 0 1 0 0 0 0 1 1 0 0 1 1
+ 1 0 1 1 1 1 1 0 0 1 1 0 1 1 0 0 1 0 1 1 1 1 0 1 1 1 1 1 0 1 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 1 1 1 1 1 1 0 1 0 1 1 0 1 1 0 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 0 1 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 0 1 0 1 1 1 1 0 0 0 1 1
+ 1 1 0 1 0 1 0 1 1 1 0 1 1 1 1 1 1 1 0 0 0 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 0
+ 0 1 0 0 1 1 1 1 1 0 1 1 1 1 1 0 1 1 1 0 1 1 0 0 1 1 1 1 1 1 0 1 1 1 1 1 1
+ 1 0 1 1 1 1 1 0 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 0 1 0 0 1 0 1 1 1 1 1 0 1 1
+ 0 1 0 1 1 0 1 0 1 1 1 1 1 1 1 1 0 0 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 0 1
+ 1 1 1 1 1 1 0 1 0 1 1 0 1 1 1 1 1 0 0 1 0 1 0 1 1 1 1 1 0 1 1 0 1 0 1 0 0
+ 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 0 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 0 0 0 0 0 0 1]
+
+print(cancer['target_names'])
+     
+['malignant' 'benign']
+
+print(cancer['feature_names'])
+     
+['mean radius' 'mean texture' 'mean perimeter' 'mean area'
+ 'mean smoothness' 'mean compactness' 'mean concavity'
+ 'mean concave points' 'mean symmetry' 'mean fractal dimension'
+ 'radius error' 'texture error' 'perimeter error' 'area error'
+ 'smoothness error' 'compactness error' 'concavity error'
+ 'concave points error' 'symmetry error' 'fractal dimension error'
+ 'worst radius' 'worst texture' 'worst perimeter' 'worst area'
+ 'worst smoothness' 'worst compactness' 'worst concavity'
+ 'worst concave points' 'worst symmetry' 'worst fractal dimension']
+
+print(cancer['data'])
+     
+[[1.799e+01 1.038e+01 1.228e+02 ... 2.654e-01 4.601e-01 1.189e-01]
+ [2.057e+01 1.777e+01 1.329e+02 ... 1.860e-01 2.750e-01 8.902e-02]
+ [1.969e+01 2.125e+01 1.300e+02 ... 2.430e-01 3.613e-01 8.758e-02]
+ ...
+ [1.660e+01 2.808e+01 1.083e+02 ... 1.418e-01 2.218e-01 7.820e-02]
+ [2.060e+01 2.933e+01 1.401e+02 ... 2.650e-01 4.087e-01 1.240e-01]
+ [7.760e+00 2.454e+01 4.792e+01 ... 0.000e+00 2.871e-01 7.039e-02]]
+
+cancer['data'].shape
+     
+(569, 30)
+
+df_cancer = pd.DataFrame(np.c_[cancer['data'], cancer['target']], columns = np.append(cancer['feature_names'], ['target']))
+     
+
+df_cancer.head(5)
+     
+mean radius	mean texture	mean perimeter	mean area	mean smoothness	mean compactness	mean concavity	mean concave points	mean symmetry	mean fractal dimension	radius error	texture error	perimeter error	area error	smoothness error	compactness error	concavity error	concave points error	symmetry error	fractal dimension error	worst radius	worst texture	worst perimeter	worst area	worst smoothness	worst compactness	worst concavity	worst concave points	worst symmetry	worst fractal dimension	target
+0	17.99	10.38	122.80	1001.0	0.11840	0.27760	0.3001	0.14710	0.2419	0.07871	1.0950	0.9053	8.589	153.40	0.006399	0.04904	0.05373	0.01587	0.03003	0.006193	25.38	17.33	184.60	2019.0	0.1622	0.6656	0.7119	0.2654	0.4601	0.11890	0.0
+1	20.57	17.77	132.90	1326.0	0.08474	0.07864	0.0869	0.07017	0.1812	0.05667	0.5435	0.7339	3.398	74.08	0.005225	0.01308	0.01860	0.01340	0.01389	0.003532	24.99	23.41	158.80	1956.0	0.1238	0.1866	0.2416	0.1860	0.2750	0.08902	0.0
+2	19.69	21.25	130.00	1203.0	0.10960	0.15990	0.1974	0.12790	0.2069	0.05999	0.7456	0.7869	4.585	94.03	0.006150	0.04006	0.03832	0.02058	0.02250	0.004571	23.57	25.53	152.50	1709.0	0.1444	0.4245	0.4504	0.2430	0.3613	0.08758	0.0
+3	11.42	20.38	77.58	386.1	0.14250	0.28390	0.2414	0.10520	0.2597	0.09744	0.4956	1.1560	3.445	27.23	0.009110	0.07458	0.05661	0.01867	0.05963	0.009208	14.91	26.50	98.87	567.7	0.2098	0.8663	0.6869	0.2575	0.6638	0.17300	0.0
+4	20.29	14.34	135.10	1297.0	0.10030	0.13280	0.1980	0.10430	0.1809	0.05883	0.7572	0.7813	5.438	94.44	0.011490	0.02461	0.05688	0.01885	0.01756	0.005115	22.54	16.67	152.20	1575.0	0.1374	0.2050	0.4000	0.1625	0.2364	0.07678	0.0
+
+df_cancer.tail(5)
+     
+mean radius	mean texture	mean perimeter	mean area	mean smoothness	mean compactness	mean concavity	mean concave points	mean symmetry	mean fractal dimension	radius error	texture error	perimeter error	area error	smoothness error	compactness error	concavity error	concave points error	symmetry error	fractal dimension error	worst radius	worst texture	worst perimeter	worst area	worst smoothness	worst compactness	worst concavity	worst concave points	worst symmetry	worst fractal dimension	target
+564	21.56	22.39	142.00	1479.0	0.11100	0.11590	0.24390	0.13890	0.1726	0.05623	1.1760	1.256	7.673	158.70	0.010300	0.02891	0.05198	0.02454	0.01114	0.004239	25.450	26.40	166.10	2027.0	0.14100	0.21130	0.4107	0.2216	0.2060	0.07115	0.0
+565	20.13	28.25	131.20	1261.0	0.09780	0.10340	0.14400	0.09791	0.1752	0.05533	0.7655	2.463	5.203	99.04	0.005769	0.02423	0.03950	0.01678	0.01898	0.002498	23.690	38.25	155.00	1731.0	0.11660	0.19220	0.3215	0.1628	0.2572	0.06637	0.0
+566	16.60	28.08	108.30	858.1	0.08455	0.10230	0.09251	0.05302	0.1590	0.05648	0.4564	1.075	3.425	48.55	0.005903	0.03731	0.04730	0.01557	0.01318	0.003892	18.980	34.12	126.70	1124.0	0.11390	0.30940	0.3403	0.1418	0.2218	0.07820	0.0
+567	20.60	29.33	140.10	1265.0	0.11780	0.27700	0.35140	0.15200	0.2397	0.07016	0.7260	1.595	5.772	86.22	0.006522	0.06158	0.07117	0.01664	0.02324	0.006185	25.740	39.42	184.60	1821.0	0.16500	0.86810	0.9387	0.2650	0.4087	0.12400	0.0
+568	7.76	24.54	47.92	181.0	0.05263	0.04362	0.00000	0.00000	0.1587	0.05884	0.3857	1.428	2.548	19.15	0.007189	0.00466	0.00000	0.00000	0.02676	0.002783	9.456	30.37	59.16	268.6	0.08996	0.06444	0.0000	0.0000	0.2871	0.07039	1.0
+VISUALIZING THE DATA
+
+
+sns.pairplot(df_cancer,vars= ['mean radius','mean texture', 'mean area', 'mean perimeter', 'mean smoothness'])
+     
+<seaborn.axisgrid.PairGrid at 0x7f8086a06b38>
+
+But the only problem is that doesn't show the target class. It doesn't show actual which one of these samples is malignant or which one of them is benign.
+
+
+sns.pairplot(df_cancer,hue = 'target', vars= ['mean radius','mean texture', 'mean area', 'mean perimeter', 'mean smoothness'])
+     
+<seaborn.axisgrid.PairGrid at 0x7f8076457860>
+
+The blue points in here that's the malignant case. The orange points in here that's the benign case.
+
+
+sns.countplot(df_cancer['target'])
+     
+<matplotlib.axes._subplots.AxesSubplot at 0x7f8074201278>
+
+We take one of these slide graphs and see how can we play.
+
+
+sns.scatterplot(x='mean area', y='mean smoothness', hue='target', data=df_cancer)
+     
+<matplotlib.axes._subplots.AxesSubplot at 0x7f807423ba20>
+
+Let's check the correlation between the variables
+
+
+plt.figure(figsize=(20,10))
+sns.heatmap(df_cancer.corr(), annot=True)
+     
+<matplotlib.axes._subplots.AxesSubplot at 0x7f807418f320>
+
+MODEL TRAINING (FINDING A PROBLEM SOLUTION)
+
+
+# Let's drop the target label coloumns
+x = df_cancer.drop(['target'],axis=1)
+     
+
+x
+     
+mean radius	mean texture	mean perimeter	mean area	mean smoothness	mean compactness	mean concavity	mean concave points	mean symmetry	mean fractal dimension	radius error	texture error	perimeter error	area error	smoothness error	compactness error	concavity error	concave points error	symmetry error	fractal dimension error	worst radius	worst texture	worst perimeter	worst area	worst smoothness	worst compactness	worst concavity	worst concave points	worst symmetry	worst fractal dimension
+0	17.99	10.38	122.80	1001.0	0.11840	0.27760	0.30010	0.14710	0.2419	0.07871	1.0950	0.9053	8.589	153.40	0.006399	0.04904	0.05373	0.01587	0.03003	0.006193	25.380	17.33	184.60	2019.0	0.16220	0.66560	0.7119	0.2654	0.4601	0.11890
+1	20.57	17.77	132.90	1326.0	0.08474	0.07864	0.08690	0.07017	0.1812	0.05667	0.5435	0.7339	3.398	74.08	0.005225	0.01308	0.01860	0.01340	0.01389	0.003532	24.990	23.41	158.80	1956.0	0.12380	0.18660	0.2416	0.1860	0.2750	0.08902
+2	19.69	21.25	130.00	1203.0	0.10960	0.15990	0.19740	0.12790	0.2069	0.05999	0.7456	0.7869	4.585	94.03	0.006150	0.04006	0.03832	0.02058	0.02250	0.004571	23.570	25.53	152.50	1709.0	0.14440	0.42450	0.4504	0.2430	0.3613	0.08758
+3	11.42	20.38	77.58	386.1	0.14250	0.28390	0.24140	0.10520	0.2597	0.09744	0.4956	1.1560	3.445	27.23	0.009110	0.07458	0.05661	0.01867	0.05963	0.009208	14.910	26.50	98.87	567.7	0.20980	0.86630	0.6869	0.2575	0.6638	0.17300
+4	20.29	14.34	135.10	1297.0	0.10030	0.13280	0.19800	0.10430	0.1809	0.05883	0.7572	0.7813	5.438	94.44	0.011490	0.02461	0.05688	0.01885	0.01756	0.005115	22.540	16.67	152.20	1575.0	0.13740	0.20500	0.4000	0.1625	0.2364	0.07678
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+564	21.56	22.39	142.00	1479.0	0.11100	0.11590	0.24390	0.13890	0.1726	0.05623	1.1760	1.2560	7.673	158.70	0.010300	0.02891	0.05198	0.02454	0.01114	0.004239	25.450	26.40	166.10	2027.0	0.14100	0.21130	0.4107	0.2216	0.2060	0.07115
+565	20.13	28.25	131.20	1261.0	0.09780	0.10340	0.14400	0.09791	0.1752	0.05533	0.7655	2.4630	5.203	99.04	0.005769	0.02423	0.03950	0.01678	0.01898	0.002498	23.690	38.25	155.00	1731.0	0.11660	0.19220	0.3215	0.1628	0.2572	0.06637
+566	16.60	28.08	108.30	858.1	0.08455	0.10230	0.09251	0.05302	0.1590	0.05648	0.4564	1.0750	3.425	48.55	0.005903	0.03731	0.04730	0.01557	0.01318	0.003892	18.980	34.12	126.70	1124.0	0.11390	0.30940	0.3403	0.1418	0.2218	0.07820
+567	20.60	29.33	140.10	1265.0	0.11780	0.27700	0.35140	0.15200	0.2397	0.07016	0.7260	1.5950	5.772	86.22	0.006522	0.06158	0.07117	0.01664	0.02324	0.006185	25.740	39.42	184.60	1821.0	0.16500	0.86810	0.9387	0.2650	0.4087	0.12400
+568	7.76	24.54	47.92	181.0	0.05263	0.04362	0.00000	0.00000	0.1587	0.05884	0.3857	1.4280	2.548	19.15	0.007189	0.00466	0.00000	0.00000	0.02676	0.002783	9.456	30.37	59.16	268.6	0.08996	0.06444	0.0000	0.0000	0.2871	0.07039
+569 rows × 30 columns
+
+
+y = df_cancer['target']
+y
+     
+0      0.0
+1      0.0
+2      0.0
+3      0.0
+4      0.0
+      ... 
+564    0.0
+565    0.0
+566    0.0
+567    0.0
+568    1.0
+Name: target, Length: 569, dtype: float64
+If you get a call that we have to take in our model we're going to do that we use a subset of our data for training and then after them on the list trained what we're going to do in order to test the model we're going to use the testing dataset which is data said that the modern has seen ever before.
+
+
+from sklearn.model_selection import train_test_split
+     
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.20, random_state= 5)
+     
+
+x_train
+     
+mean radius	mean texture	mean perimeter	mean area	mean smoothness	mean compactness	mean concavity	mean concave points	mean symmetry	mean fractal dimension	radius error	texture error	perimeter error	area error	smoothness error	compactness error	concavity error	concave points error	symmetry error	fractal dimension error	worst radius	worst texture	worst perimeter	worst area	worst smoothness	worst compactness	worst concavity	worst concave points	worst symmetry	worst fractal dimension
+306	13.200	15.82	84.07	537.3	0.08511	0.05251	0.001461	0.003261	0.1632	0.05894	0.1903	0.5735	1.204	15.500	0.003632	0.007861	0.001128	0.002386	0.01344	0.002585	14.41	20.45	92.00	636.9	0.11280	0.1346	0.01120	0.02500	0.2651	0.08385
+410	11.360	17.57	72.49	399.8	0.08858	0.05313	0.027830	0.021000	0.1601	0.05913	0.1916	1.5550	1.359	13.660	0.005391	0.009947	0.011630	0.005872	0.01341	0.001659	13.05	36.32	85.07	521.3	0.14530	0.1622	0.18110	0.08698	0.2973	0.07745
+197	18.080	21.84	117.40	1024.0	0.07371	0.08642	0.110300	0.057780	0.1770	0.05340	0.6362	1.3050	4.312	76.360	0.005530	0.052960	0.061100	0.014440	0.02140	0.005036	19.76	24.70	129.10	1228.0	0.08822	0.1963	0.25350	0.09181	0.2369	0.06558
+376	10.570	20.22	70.15	338.3	0.09073	0.16600	0.228000	0.059410	0.2188	0.08450	0.1115	1.2310	2.363	7.228	0.008499	0.076430	0.153500	0.029190	0.01617	0.012200	10.85	22.82	76.51	351.9	0.11430	0.3619	0.60300	0.14650	0.2597	0.12000
+244	19.400	23.50	129.10	1155.0	0.10270	0.15580	0.204900	0.088860	0.1978	0.06000	0.5243	1.8020	4.037	60.410	0.010610	0.032520	0.039150	0.015590	0.02186	0.003949	21.65	30.53	144.90	1417.0	0.14630	0.2968	0.34580	0.15640	0.2920	0.07614
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+8	13.000	21.82	87.50	519.8	0.12730	0.19320	0.185900	0.093530	0.2350	0.07389	0.3063	1.0020	2.406	24.320	0.005731	0.035020	0.035530	0.012260	0.02143	0.003749	15.49	30.73	106.20	739.3	0.17030	0.5401	0.53900	0.20600	0.4378	0.10720
+73	13.800	15.79	90.43	584.1	0.10070	0.12800	0.077890	0.050690	0.1662	0.06566	0.2787	0.6205	1.957	23.350	0.004717	0.020650	0.017590	0.009206	0.01220	0.003130	16.57	20.86	110.30	812.4	0.14110	0.3542	0.27790	0.13830	0.2589	0.10300
+400	17.910	21.02	124.40	994.0	0.12300	0.25760	0.318900	0.119800	0.2113	0.07115	0.4030	0.7747	3.123	41.510	0.007159	0.037180	0.061650	0.010510	0.01591	0.005099	20.80	27.78	149.60	1304.0	0.18730	0.5917	0.90340	0.19640	0.3245	0.11980
+118	15.780	22.91	105.70	782.6	0.11550	0.17520	0.213300	0.094790	0.2096	0.07331	0.5520	1.0720	3.598	58.630	0.008699	0.039760	0.059500	0.013900	0.01495	0.005984	20.19	30.50	130.30	1272.0	0.18550	0.4925	0.73560	0.20340	0.3274	0.12520
+206	9.876	17.27	62.92	295.4	0.10890	0.07232	0.017560	0.019520	0.1934	0.06285	0.2137	1.3420	1.517	12.330	0.009719	0.012490	0.007975	0.007527	0.02210	0.002472	10.42	23.22	67.08	331.6	0.14150	0.1247	0.06213	0.05588	0.2989	0.07380
+455 rows × 30 columns
+
+
+x_train.shape
+     
+(455, 30)
+
+x_test
+     
+mean radius	mean texture	mean perimeter	mean area	mean smoothness	mean compactness	mean concavity	mean concave points	mean symmetry	mean fractal dimension	radius error	texture error	perimeter error	area error	smoothness error	compactness error	concavity error	concave points error	symmetry error	fractal dimension error	worst radius	worst texture	worst perimeter	worst area	worst smoothness	worst compactness	worst concavity	worst concave points	worst symmetry	worst fractal dimension
+28	15.30	25.27	102.40	732.4	0.10820	0.16970	0.16830	0.08751	0.1926	0.06540	0.4390	1.0120	3.498	43.50	0.005233	0.030570	0.03576	0.010830	0.01768	0.002967	20.27	36.71	149.30	1269.0	0.1641	0.61100	0.63350	0.20240	0.4027	0.09876
+163	12.34	22.22	79.85	464.5	0.10120	0.10150	0.05370	0.02822	0.1551	0.06761	0.2949	1.6560	1.955	21.55	0.011340	0.031750	0.03125	0.011350	0.01879	0.005348	13.58	28.68	87.36	553.0	0.1452	0.23380	0.16880	0.08194	0.2268	0.09082
+123	14.50	10.89	94.28	640.7	0.11010	0.10990	0.08842	0.05778	0.1856	0.06402	0.2929	0.8570	1.928	24.19	0.003818	0.012760	0.02882	0.012000	0.01910	0.002808	15.70	15.98	102.80	745.5	0.1313	0.17880	0.25600	0.12210	0.2889	0.08006
+361	13.30	21.57	85.24	546.1	0.08582	0.06373	0.03344	0.02424	0.1815	0.05696	0.2621	1.5390	2.028	20.98	0.005498	0.020450	0.01795	0.006399	0.01829	0.001956	14.20	29.20	92.94	621.2	0.1140	0.16670	0.12120	0.05614	0.2637	0.06658
+549	10.82	24.21	68.89	361.6	0.08192	0.06602	0.01548	0.00816	0.1976	0.06328	0.5196	1.9180	3.564	33.00	0.008263	0.018700	0.01277	0.005917	0.02466	0.002977	13.03	31.45	83.90	505.6	0.1204	0.16330	0.06194	0.03264	0.3059	0.07626
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+414	15.13	29.81	96.71	719.5	0.08320	0.04605	0.04686	0.02739	0.1852	0.05294	0.4681	1.6270	3.043	45.38	0.006831	0.014270	0.02489	0.009087	0.03151	0.001750	17.26	36.91	110.10	931.4	0.1148	0.09866	0.15470	0.06575	0.3233	0.06165
+515	11.34	18.61	72.76	391.2	0.10490	0.08499	0.04302	0.02594	0.1927	0.06211	0.2430	1.0100	1.491	18.19	0.008577	0.016410	0.02099	0.011070	0.02434	0.001217	12.47	23.03	79.15	478.6	0.1483	0.15740	0.16240	0.08542	0.3060	0.06783
+186	18.31	18.58	118.60	1041.0	0.08588	0.08468	0.08169	0.05814	0.1621	0.05425	0.2577	0.4757	1.817	28.92	0.002866	0.009181	0.01412	0.006719	0.01069	0.001087	21.31	26.36	139.20	1410.0	0.1234	0.24450	0.35380	0.15710	0.3206	0.06938
+3	11.42	20.38	77.58	386.1	0.14250	0.28390	0.24140	0.10520	0.2597	0.09744	0.4956	1.1560	3.445	27.23	0.009110	0.074580	0.05661	0.018670	0.05963	0.009208	14.91	26.50	98.87	567.7	0.2098	0.86630	0.68690	0.25750	0.6638	0.17300
+261	17.35	23.06	111.00	933.1	0.08662	0.06290	0.02891	0.02837	0.1564	0.05307	0.4007	1.3170	2.577	44.41	0.005726	0.011060	0.01246	0.007671	0.01411	0.001578	19.85	31.47	128.20	1218.0	0.1240	0.14860	0.12110	0.08235	0.2452	0.06515
+114 rows × 30 columns
+
+
+x_test.shape
+     
+(114, 30)
+
+y_train
+     
+306    1.0
+410    1.0
+197    0.0
+376    1.0
+244    0.0
+      ... 
+8      0.0
+73     0.0
+400    0.0
+118    0.0
+206    1.0
+Name: target, Length: 455, dtype: float64
+
+y_train.shape
+     
+(455,)
+
+y_test
+     
+28     0.0
+163    1.0
+123    1.0
+361    1.0
+549    1.0
+      ... 
+414    0.0
+515    1.0
+186    0.0
+3      0.0
+261    0.0
+Name: target, Length: 114, dtype: float64
+
+y_test.shape
+     
+(114,)
+
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, confusion_matrix
+     
+
+svc_model = SVC()
+     
+
+svc_model.fit(x_train, y_train)
+     
+SVC(C=1.0, break_ties=False, cache_size=200, class_weight=None, coef0=0.0,
+    decision_function_shape='ovr', degree=3, gamma='scale', kernel='rbf',
+    max_iter=-1, probability=False, random_state=None, shrinking=True,
+    tol=0.001, verbose=False)
+EVALUATING THE MODEL
+
+We're talking about the testing data which has data that has never seen before.
+
+
+y_predict = svc_model.predict(x_test)
+     
+
+y_predict
+     
+array([0., 1., 1., 1., 1., 0., 1., 1., 1., 1., 1., 1., 0., 1., 1., 1., 1.,
+       1., 1., 1., 0., 1., 1., 1., 1., 1., 1., 0., 1., 0., 0., 0., 1., 0.,
+       1., 1., 0., 1., 1., 0., 1., 1., 1., 0., 1., 1., 0., 0., 1., 0., 1.,
+       1., 1., 1., 1., 0., 1., 0., 1., 0., 0., 1., 1., 1., 1., 1., 1., 1.,
+       1., 0., 1., 0., 1., 1., 1., 1., 1., 1., 0., 0., 0., 1., 0., 0., 0.,
+       1., 0., 1., 0., 0., 0., 0., 1., 1., 0., 0., 1., 1., 1., 1., 1., 0.,
+       1., 1., 0., 0., 1., 0., 1., 0., 1., 0., 1., 0.])
+We're going to plot a confusion matrix. We need to specify compare our true value versus the predicted that.
+
+
+cm = confusion_matrix(y_test, y_predict)
+     
+
+sns.heatmap(cm, annot=True)
+     
+<matplotlib.axes._subplots.AxesSubplot at 0x7f807264af98>
+
+
+print(classification_report(y_test, y_predict))
+     
+              precision    recall  f1-score   support
+
+         0.0       1.00      0.85      0.92        48
+         1.0       0.90      1.00      0.95        66
+
+    accuracy                           0.94       114
+   macro avg       0.95      0.93      0.94       114
+weighted avg       0.94      0.94      0.94       114
+
+IMPROVING THE MODEL
+
+
+min_train = x_train.min()
+min_train
+     
+mean radius                  6.981000
+mean texture                 9.710000
+mean perimeter              43.790000
+mean area                  143.500000
+mean smoothness              0.052630
+mean compactness             0.019380
+mean concavity               0.000000
+mean concave points          0.000000
+mean symmetry                0.106000
+mean fractal dimension       0.049960
+radius error                 0.111500
+texture error                0.362100
+perimeter error              0.757000
+area error                   6.802000
+smoothness error             0.001713
+compactness error            0.002252
+concavity error              0.000000
+concave points error         0.000000
+symmetry error               0.007882
+fractal dimension error      0.000950
+worst radius                 7.930000
+worst texture               12.020000
+worst perimeter             50.410000
+worst area                 185.200000
+worst smoothness             0.071170
+worst compactness            0.027290
+worst concavity              0.000000
+worst concave points         0.000000
+worst symmetry               0.156500
+worst fractal dimension      0.055040
+dtype: float64
+
+range_train = (x_train - min_train).max()
+range_train
+     
+mean radius                  21.129000
+mean texture                 29.570000
+mean perimeter              144.710000
+mean area                  2355.500000
+mean smoothness               0.110770
+mean compactness              0.326020
+mean concavity                0.426800
+mean concave points           0.201200
+mean symmetry                 0.198000
+mean fractal dimension        0.045790
+radius error                  2.761500
+texture error                 4.522900
+perimeter error              21.223000
+area error                  518.798000
+smoothness error              0.029417
+compactness error             0.133148
+concavity error               0.396000
+concave points error          0.052790
+symmetry error                0.071068
+fractal dimension error       0.028890
+worst radius                 25.190000
+worst texture                37.520000
+worst perimeter             170.390000
+worst area                 3246.800000
+worst smoothness              0.129430
+worst compactness             1.030710
+worst concavity               1.105000
+worst concave points          0.291000
+worst symmetry                0.420900
+worst fractal dimension       0.152460
+dtype: float64
+
+x_train_scaled = (x_train - min_train)/range_train
+x_train_scaled
+     
+mean radius	mean texture	mean perimeter	mean area	mean smoothness	mean compactness	mean concavity	mean concave points	mean symmetry	mean fractal dimension	radius error	texture error	perimeter error	area error	smoothness error	compactness error	concavity error	concave points error	symmetry error	fractal dimension error	worst radius	worst texture	worst perimeter	worst area	worst smoothness	worst compactness	worst concavity	worst concave points	worst symmetry	worst fractal dimension
+306	0.294335	0.206628	0.278350	0.167183	0.293220	0.101620	0.003423	0.016208	0.288889	0.196113	0.028535	0.046740	0.021062	0.016766	0.065234	0.042126	0.002848	0.045198	0.078207	0.056587	0.257245	0.224680	0.244087	0.139122	0.321641	0.104113	0.010136	0.085911	0.258019	0.188968
+410	0.207251	0.265810	0.198328	0.108809	0.324546	0.103521	0.065206	0.104374	0.273232	0.200262	0.029006	0.263747	0.028365	0.013219	0.125030	0.057793	0.029369	0.111233	0.077785	0.024535	0.203255	0.647655	0.203416	0.103517	0.572742	0.130890	0.163891	0.298900	0.334521	0.146989
+197	0.525297	0.410213	0.508673	0.373806	0.190304	0.205632	0.258435	0.287177	0.358586	0.075126	0.190005	0.208472	0.167507	0.134075	0.129755	0.380839	0.154293	0.273537	0.190212	0.141427	0.469631	0.337953	0.461823	0.321178	0.131731	0.163974	0.229412	0.315498	0.191019	0.069133
+376	0.169861	0.355428	0.182157	0.082700	0.343956	0.449727	0.534208	0.295278	0.569697	0.754313	0.000000	0.192111	0.075673	0.000821	0.230683	0.557109	0.387626	0.552946	0.116621	0.389404	0.115919	0.287846	0.153178	0.051343	0.333230	0.324640	0.545701	0.503436	0.245189	0.426079
+244	0.587770	0.466351	0.589524	0.429421	0.452018	0.418441	0.480084	0.441650	0.463636	0.219262	0.149484	0.318358	0.154549	0.103331	0.302444	0.227326	0.098864	0.295321	0.196685	0.103801	0.544661	0.493337	0.554551	0.379389	0.580468	0.261480	0.312941	0.537457	0.321929	0.138397
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+8	0.284869	0.409537	0.302052	0.159754	0.674099	0.533157	0.435567	0.464861	0.651515	0.522603	0.070541	0.141480	0.077699	0.033767	0.136588	0.246102	0.089722	0.232241	0.190634	0.096878	0.300119	0.498667	0.327425	0.170660	0.765897	0.497531	0.487783	0.707904	0.668330	0.342123
+73	0.322732	0.205614	0.322300	0.187052	0.433962	0.333170	0.182498	0.251938	0.304040	0.342870	0.060547	0.057131	0.056542	0.031897	0.102118	0.138177	0.044419	0.174389	0.060759	0.075452	0.342993	0.235608	0.351488	0.193175	0.540292	0.317170	0.251493	0.475258	0.243288	0.314574
+400	0.517251	0.382482	0.557045	0.361070	0.635280	0.730691	0.747188	0.595427	0.531818	0.462765	0.105559	0.091225	0.111483	0.066901	0.185131	0.262325	0.155682	0.199091	0.112962	0.143608	0.510917	0.420043	0.582135	0.344585	0.897242	0.547593	0.817557	0.674914	0.399145	0.424767
+118	0.416442	0.446398	0.427821	0.271322	0.567572	0.477946	0.499766	0.471123	0.523232	0.509937	0.159515	0.156957	0.133864	0.099900	0.237482	0.281702	0.150253	0.263307	0.099454	0.174241	0.486701	0.492537	0.468866	0.334730	0.883335	0.451349	0.665701	0.698969	0.406035	0.460186
+206	0.137015	0.255665	0.132195	0.064487	0.507990	0.162383	0.041143	0.097018	0.441414	0.281503	0.037009	0.216653	0.035810	0.010655	0.272156	0.076892	0.020139	0.142584	0.200062	0.052676	0.098849	0.298507	0.097834	0.045091	0.543383	0.094508	0.056226	0.192027	0.338323	0.123049
+455 rows × 30 columns
+
+
+sns.scatterplot(x = x_train['mean area'], y= x_train['mean smoothness'], hue= y_train)
+     
+<matplotlib.axes._subplots.AxesSubplot at 0x7f8070a818d0>
+
+
+sns.scatterplot(x= x_train_scaled['mean area'], y= x_train_scaled['mean smoothness'], hue= y_train)
+     
+<matplotlib.axes._subplots.AxesSubplot at 0x7f80709f18d0>
+
+
+min_test = x_test.min()
+range_test = (x_test - min_test).max()
+x_test_scaled = (x_test - min_test)/ range_test
+     
+
+svc_model.fit(x_train_scaled, y_train)
+     
+SVC(C=1.0, break_ties=False, cache_size=200, class_weight=None, coef0=0.0,
+    decision_function_shape='ovr', degree=3, gamma='scale', kernel='rbf',
+    max_iter=-1, probability=False, random_state=None, shrinking=True,
+    tol=0.001, verbose=False)
+
+y_predict = svc_model.predict(x_test_scaled)
+     
+
+cm = confusion_matrix(y_test, y_predict)
+     
+
+sns.heatmap(cm, annot=True, fmt = 'd')
+     
+<matplotlib.axes._subplots.AxesSubplot at 0x7f80709f1be0>
+
+
+print(classification_report(y_test, y_predict))
+     
+              precision    recall  f1-score   support
+
+         0.0       1.00      0.92      0.96        48
+         1.0       0.94      1.00      0.97        66
+
+    accuracy                           0.96       114
+   macro avg       0.97      0.96      0.96       114
+weighted avg       0.97      0.96      0.96       114
+
+IMPROVING THE MODEL - PART 2
+
+
+param_grid = {'C': [0.1, 1, 10, 100], 'gamma': [1, 0.1, 0.01, 0.001], 'kernel': ['rbf']} 
+     
+
+from sklearn.model_selection import GridSearchCV
+     
+
+grid = GridSearchCV(SVC(), param_grid, refit= True, verbose= 4)
+     
+
+grid.fit(x_train_scaled, y_train)
+     
+Fitting 5 folds for each of 16 candidates, totalling 80 fits
+[CV] C=0.1, gamma=1, kernel=rbf ......................................
+[CV] .......... C=0.1, gamma=1, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=0.1, gamma=1, kernel=rbf ......................................
+[CV] .......... C=0.1, gamma=1, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=0.1, gamma=1, kernel=rbf ......................................
+[CV] .......... C=0.1, gamma=1, kernel=rbf, score=0.912, total=   0.0s
+[CV] C=0.1, gamma=1, kernel=rbf ......................................
+[CV] .......... C=0.1, gamma=1, kernel=rbf, score=0.956, total=   0.0s
+[CV] C=0.1, gamma=1, kernel=rbf ......................................
+[CV] .......... C=0.1, gamma=1, kernel=rbf, score=0.934, total=   0.0s
+[CV] C=0.1, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=0.1, gamma=0.1, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=0.1, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=0.1, gamma=0.1, kernel=rbf, score=0.901, total=   0.0s
+[CV] C=0.1, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=0.1, gamma=0.1, kernel=rbf, score=0.890, total=   0.0s
+[CV] C=0.1, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=0.1, gamma=0.1, kernel=rbf, score=0.923, total=   0.0s
+[CV] C=0.1, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=0.1, gamma=0.1, kernel=rbf, score=0.868, total=   0.0s
+[CV] C=0.1, gamma=0.01, kernel=rbf ...................................
+[Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
+[Parallel(n_jobs=1)]: Done   1 out of   1 | elapsed:    0.0s remaining:    0.0s
+[Parallel(n_jobs=1)]: Done   2 out of   2 | elapsed:    0.0s remaining:    0.0s
+[Parallel(n_jobs=1)]: Done   3 out of   3 | elapsed:    0.1s remaining:    0.0s
+[CV] ....... C=0.1, gamma=0.01, kernel=rbf, score=0.648, total=   0.0s
+[CV] C=0.1, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=0.1, gamma=0.01, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=0.1, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=0.1, gamma=0.01, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=0.1, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=0.1, gamma=0.01, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=0.1, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=0.1, gamma=0.01, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=0.1, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=0.1, gamma=0.001, kernel=rbf, score=0.648, total=   0.0s
+[CV] C=0.1, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=0.1, gamma=0.001, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=0.1, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=0.1, gamma=0.001, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=0.1, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=0.1, gamma=0.001, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=0.1, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=0.1, gamma=0.001, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=1, gamma=1, kernel=rbf ........................................
+[CV] ............ C=1, gamma=1, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=1, gamma=1, kernel=rbf ........................................
+[CV] ............ C=1, gamma=1, kernel=rbf, score=0.956, total=   0.0s
+[CV] C=1, gamma=1, kernel=rbf ........................................
+[CV] ............ C=1, gamma=1, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=1, gamma=1, kernel=rbf ........................................
+[CV] ............ C=1, gamma=1, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=1, gamma=1, kernel=rbf ........................................
+[CV] ............ C=1, gamma=1, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=1, gamma=0.1, kernel=rbf ......................................
+[CV] .......... C=1, gamma=0.1, kernel=rbf, score=0.989, total=   0.0s
+[CV] C=1, gamma=0.1, kernel=rbf ......................................
+[CV] .......... C=1, gamma=0.1, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=1, gamma=0.1, kernel=rbf ......................................
+[CV] .......... C=1, gamma=0.1, kernel=rbf, score=0.923, total=   0.0s
+[CV] C=1, gamma=0.1, kernel=rbf ......................................
+[CV] .......... C=1, gamma=0.1, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=1, gamma=0.1, kernel=rbf ......................................
+[CV] .......... C=1, gamma=0.1, kernel=rbf, score=0.934, total=   0.0s
+[CV] C=1, gamma=0.01, kernel=rbf .....................................
+[CV] ......... C=1, gamma=0.01, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=1, gamma=0.01, kernel=rbf .....................................
+[CV] ......... C=1, gamma=0.01, kernel=rbf, score=0.901, total=   0.0s
+[CV] C=1, gamma=0.01, kernel=rbf .....................................
+[CV] ......... C=1, gamma=0.01, kernel=rbf, score=0.879, total=   0.0s
+[CV] C=1, gamma=0.01, kernel=rbf .....................................
+[CV] ......... C=1, gamma=0.01, kernel=rbf, score=0.923, total=   0.0s
+[CV] C=1, gamma=0.01, kernel=rbf .....................................
+[CV] ......... C=1, gamma=0.01, kernel=rbf, score=0.868, total=   0.0s
+[CV] C=1, gamma=0.001, kernel=rbf ....................................
+[CV] ........ C=1, gamma=0.001, kernel=rbf, score=0.648, total=   0.0s
+[CV] C=1, gamma=0.001, kernel=rbf ....................................
+[CV] ........ C=1, gamma=0.001, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=1, gamma=0.001, kernel=rbf ....................................
+[CV] ........ C=1, gamma=0.001, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=1, gamma=0.001, kernel=rbf ....................................
+[CV] ........ C=1, gamma=0.001, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=1, gamma=0.001, kernel=rbf ....................................
+[CV] ........ C=1, gamma=0.001, kernel=rbf, score=0.637, total=   0.0s
+[CV] C=10, gamma=1, kernel=rbf .......................................
+[CV] ........... C=10, gamma=1, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=10, gamma=1, kernel=rbf .......................................
+[CV] ........... C=10, gamma=1, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=10, gamma=1, kernel=rbf .......................................
+[CV] ........... C=10, gamma=1, kernel=rbf, score=0.956, total=   0.0s
+[CV] C=10, gamma=1, kernel=rbf .......................................
+[CV] ........... C=10, gamma=1, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=10, gamma=1, kernel=rbf .......................................
+[CV] ........... C=10, gamma=1, kernel=rbf, score=0.956, total=   0.0s
+[CV] C=10, gamma=0.1, kernel=rbf .....................................
+[CV] ......... C=10, gamma=0.1, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=10, gamma=0.1, kernel=rbf .....................................
+[CV] ......... C=10, gamma=0.1, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=10, gamma=0.1, kernel=rbf .....................................
+[CV] ......... C=10, gamma=0.1, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=10, gamma=0.1, kernel=rbf .....................................
+[CV] ......... C=10, gamma=0.1, kernel=rbf, score=0.989, total=   0.0s
+[CV] C=10, gamma=0.1, kernel=rbf .....................................
+[CV] ......... C=10, gamma=0.1, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=10, gamma=0.01, kernel=rbf ....................................
+[CV] ........ C=10, gamma=0.01, kernel=rbf, score=0.989, total=   0.0s
+[CV] C=10, gamma=0.01, kernel=rbf ....................................
+[CV] ........ C=10, gamma=0.01, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=10, gamma=0.01, kernel=rbf ....................................
+[CV] ........ C=10, gamma=0.01, kernel=rbf, score=0.923, total=   0.0s
+[CV] C=10, gamma=0.01, kernel=rbf ....................................
+[CV] ........ C=10, gamma=0.01, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=10, gamma=0.01, kernel=rbf ....................................
+[CV] ........ C=10, gamma=0.01, kernel=rbf, score=0.934, total=   0.0s
+[CV] C=10, gamma=0.001, kernel=rbf ...................................
+[CV] ....... C=10, gamma=0.001, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=10, gamma=0.001, kernel=rbf ...................................
+[CV] ....... C=10, gamma=0.001, kernel=rbf, score=0.901, total=   0.0s
+[CV] C=10, gamma=0.001, kernel=rbf ...................................
+[CV] ....... C=10, gamma=0.001, kernel=rbf, score=0.879, total=   0.0s
+[CV] C=10, gamma=0.001, kernel=rbf ...................................
+[CV] ....... C=10, gamma=0.001, kernel=rbf, score=0.923, total=   0.0s
+[CV] C=10, gamma=0.001, kernel=rbf ...................................
+[CV] ....... C=10, gamma=0.001, kernel=rbf, score=0.879, total=   0.0s
+[CV] C=100, gamma=1, kernel=rbf ......................................
+[CV] .......... C=100, gamma=1, kernel=rbf, score=0.956, total=   0.0s
+[CV] C=100, gamma=1, kernel=rbf ......................................
+[CV] .......... C=100, gamma=1, kernel=rbf, score=0.956, total=   0.0s
+[CV] C=100, gamma=1, kernel=rbf ......................................
+[CV] .......... C=100, gamma=1, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=100, gamma=1, kernel=rbf ......................................
+[CV] .......... C=100, gamma=1, kernel=rbf, score=0.989, total=   0.0s
+[CV] C=100, gamma=1, kernel=rbf ......................................
+[CV] .......... C=100, gamma=1, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=100, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=100, gamma=0.1, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=100, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=100, gamma=0.1, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=100, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=100, gamma=0.1, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=100, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=100, gamma=0.1, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=100, gamma=0.1, kernel=rbf ....................................
+[CV] ........ C=100, gamma=0.1, kernel=rbf, score=0.956, total=   0.0s
+[CV] C=100, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=100, gamma=0.01, kernel=rbf, score=1.000, total=   0.0s
+[CV] C=100, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=100, gamma=0.01, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=100, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=100, gamma=0.01, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=100, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=100, gamma=0.01, kernel=rbf, score=0.989, total=   0.0s
+[CV] C=100, gamma=0.01, kernel=rbf ...................................
+[CV] ....... C=100, gamma=0.01, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=100, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=100, gamma=0.001, kernel=rbf, score=0.989, total=   0.0s
+[CV] C=100, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=100, gamma=0.001, kernel=rbf, score=0.945, total=   0.0s
+[CV] C=100, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=100, gamma=0.001, kernel=rbf, score=0.923, total=   0.0s
+[CV] C=100, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=100, gamma=0.001, kernel=rbf, score=0.967, total=   0.0s
+[CV] C=100, gamma=0.001, kernel=rbf ..................................
+[CV] ...... C=100, gamma=0.001, kernel=rbf, score=0.934, total=   0.0s
+[Parallel(n_jobs=1)]: Done  80 out of  80 | elapsed:    1.3s finished
+GridSearchCV(cv=None, error_score=nan,
+             estimator=SVC(C=1.0, break_ties=False, cache_size=200,
+                           class_weight=None, coef0=0.0,
+                           decision_function_shape='ovr', degree=3,
+                           gamma='scale', kernel='rbf', max_iter=-1,
+                           probability=False, random_state=None, shrinking=True,
+                           tol=0.001, verbose=False),
+             iid='deprecated', n_jobs=None,
+             param_grid={'C': [0.1, 1, 10, 100], 'gamma': [1, 0.1, 0.01, 0.001],
+                         'kernel': ['rbf']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=4)
+
+grid.best_params_
+     
+{'C': 1, 'gamma': 1, 'kernel': 'rbf'}
+
+grid.best_estimator_
+     
+SVC(C=1, break_ties=False, cache_size=200, class_weight=None, coef0=0.0,
+    decision_function_shape='ovr', degree=3, gamma=1, kernel='rbf', max_iter=-1,
+    probability=False, random_state=None, shrinking=True, tol=0.001,
+    verbose=False)
+
+grid_prediction = grid.predict(x_test_scaled)
+     
+
+cm = confusion_matrix(y_test, grid_prediction)
+     
+
+sns.heatmap(cm, annot=True)
+     
+<matplotlib.axes._subplots.AxesSubplot at 0x7f80708f1b38>
+
+
+print(classification_report(y_test,grid_prediction ))
+     
+              precision    recall  f1-score   support
+
+         0.0       1.00      0.92      0.96        48
+         1.0       0.94      1.00      0.97        66
+
+    accuracy                           0.96       114
+   macro avg       0.97      0.96      0.96       114
+weighted avg       0.97      0.96      0.96       114
+
+CONCLUSION
+
+Machine Learning techniques (SVM) was able to classify tumors into Malignant / Benign with 97% accuracy.
+The technique can rapidly evaluate breast masses and classify them in an automated fashion.
+Early breast cancer can dramatically save lives especially in the developing world
+The technique can be further improved by combining Computer Vision/ ML techniques to directly classify cancer using tissue images.
